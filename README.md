@@ -119,7 +119,7 @@ end-to-end before you have real Quest footage.
 python training/finetune.py `
   --dataset_path dataset/processed/dummy_train.jsonl `
   --output_dir training/checkpoints/dev-run `
-  --epochs 1 --batch_size 1 --max_steps 5
+  --epochs 1 --batch_size 1 --gradient_accumulation_steps 1 --max_steps 5
 ```
 
 Run `python training/finetune.py --help` for the full list of CLI flags

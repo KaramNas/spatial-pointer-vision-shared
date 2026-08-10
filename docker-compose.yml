@@ -1,0 +1,35 @@
+# Spins up the inference server for local testing.
+#
+# Requires the NVIDIA Container Toolkit on the host (see server/Dockerfile).
+# On a machine without a working NVIDIA Container Toolkit setup, comment out
+# the `deploy:` block below to run on CPU instead (slow, but useful for
+# testing the WebSocket wire protocol without a GPU).
+#
+# Usage:
+#   docker compose up --build
+#   docker compose down
+
+services:
+  inference-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      BASE_MODEL_NAME: "Qwen/Qwen2-VL-2B-Instruct"
+      # Point this at a checkpoint directory under training/checkpoints/
+      # (bind-mounted below) once you have a fine-tuned one.
+      MODEL_CHECKPOINT_PATH: ""
+      DEVICE: cuda
+    volumes:
+      # Mount checkpoints from the host so new fine-tunes don't require
+      # rebuilding the image.
+      - ./training/checkpoints:/app/training/checkpoints:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
