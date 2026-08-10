@@ -1,0 +1,4 @@
+{"image_path": "dataset/processed/dummy_images/dummy_000_red_mug.jpg", "object_label": "red mug", "bounding_box": [0, 0, 224, 224]}
+{"image_path": "dataset/processed/dummy_images/dummy_001_blue_bottle.jpg", "object_label": "blue bottle", "bounding_box": [0, 0, 224, 224]}
+{"image_path": "dataset/processed/dummy_images/dummy_002_green_plant.jpg", "object_label": "green plant", "bounding_box": [0, 0, 224, 224]}
+{"image_path": "dataset/processed/dummy_images/dummy_003_yellow_notebook.jpg", "object_label": "yellow notebook", "bounding_box": [0, 0, 224, 224]}

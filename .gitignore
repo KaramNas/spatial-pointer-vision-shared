@@ -28,6 +28,7 @@ dataset/raw/*
 dataset/processed/*
 !dataset/processed/.gitkeep
 !dataset/processed/dummy_train.jsonl
+!dataset/processed/dummy_images/
 dataset/annotations/*
 !dataset/annotations/.gitkeep
 *.mp4
