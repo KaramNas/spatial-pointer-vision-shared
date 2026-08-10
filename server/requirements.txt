@@ -1,0 +1,36 @@
+# Python environment: 3.10 or 3.11
+# Install with:
+#   pip install -r server/requirements.txt --extra-index-url https://download.pytorch.org/whl/cu121
+#
+# This mirrors the GPU-relevant pins in training/requirements.txt so a
+# checkpoint produced by training/finetune.py loads in the exact same
+# torch/transformers/peft/bitsandbytes versions it was trained with.
+
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# ---- PyTorch (CUDA 12.1 build) ----
+torch==2.4.1+cu121
+
+# ---- Web server ----
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+websockets==13.1
+python-multipart==0.0.12
+pydantic==2.9.2
+pydantic-settings==2.6.1
+
+# ---- Model inference (must match training/requirements.txt versions) ----
+transformers==4.46.3
+accelerate==1.0.1
+peft==0.13.2
+bitsandbytes==0.43.3
+qwen-vl-utils==0.0.8
+tokenizers==0.20.3
+safetensors==0.4.5
+
+# ---- Image handling ----
+Pillow==10.4.0
+numpy==1.26.4
+
+# ---- Config ----
+python-dotenv==1.0.1

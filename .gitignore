@@ -1,0 +1,67 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Training artifacts ---
+training/checkpoints/*
+!training/checkpoints/.gitkeep
+wandb/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+
+# --- Dataset (large / private media, keep structure only) ---
+dataset/raw/*
+!dataset/raw/.gitkeep
+dataset/processed/*
+!dataset/processed/.gitkeep
+!dataset/processed/dummy_train.jsonl
+dataset/annotations/*
+!dataset/annotations/.gitkeep
+*.mp4
+*.mov
+
+# --- ONNX export output ---
+scripts/exported/*
+!scripts/exported/.gitkeep
+*.onnx
+
+# --- Server ---
+server/models/*
+!server/models/.gitkeep
+
+# --- Unity ---
+quest-app/Library/
+quest-app/Temp/
+quest-app/Obj/
+quest-app/Build/
+quest-app/Builds/
+quest-app/Logs/
+quest-app/UserSettings/
+quest-app/MemoryCaptures/
+quest-app/*.csproj
+quest-app/*.sln
+quest-app/.vs/
+
+# --- Docker / env ---
+.env
+*.env.local
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/

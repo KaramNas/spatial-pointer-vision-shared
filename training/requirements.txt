@@ -1,0 +1,63 @@
+# Python environment: 3.10 or 3.11 (bitsandbytes Windows wheels target these)
+# Install with:
+#   pip install -r training/requirements.txt --extra-index-url https://download.pytorch.org/whl/cu121
+#
+# Tested target: Windows 11, NVIDIA RTX 4070 (12GB VRAM, Ada Lovelace / sm_89),
+# CUDA 12.1 driver. All GPU wheels below (torch, torchvision, bitsandbytes) are
+# self-contained pip packages that bundle their own CUDA/cuDNN runtime -- you do
+# NOT need the full NVIDIA CUDA Toolkit installed system-wide for training,
+# only a driver new enough to support CUDA 12.1 (driver >= 530.x).
+
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# ---- PyTorch (CUDA 12.1 build) ----
+torch==2.4.1+cu121
+torchvision==0.19.1+cu121
+
+# ---- Hugging Face stack ----
+# Qwen2-VL support landed in transformers 4.45; pin to a later patch release
+# for the various Qwen2-VL bugfixes that followed.
+transformers==4.46.3
+accelerate==1.0.1
+peft==0.13.2
+datasets==3.0.2
+tokenizers==0.20.3
+safetensors==0.4.5
+sentencepiece==0.2.0
+# Official Qwen2-VL helper for resizing/patchifying images & videos into the
+# format the model's processor expects (smart_resize, process_vision_info).
+qwen-vl-utils==0.0.8
+
+# ---- QLoRA (4-bit quantization) ----
+# 0.43.x is the first bitsandbytes line with official prebuilt Windows wheels
+# on PyPI (no manual compilation needed). Verified against CUDA 12.1 + a
+# 12GB card: a 2B-param model in 4-bit + LoRA adapters fits comfortably;
+# the 7B fallback fits with gradient checkpointing + batch size 1.
+bitsandbytes==0.43.3
+
+# ---- Experiment tracking (W&B preferred, TensorBoard as an offline fallback) ----
+wandb==0.18.5
+tensorboard==2.18.0
+
+# ---- Dataset / image processing ----
+opencv-python==4.10.0.84
+Pillow==10.4.0
+numpy==1.26.4
+albumentations==1.4.18
+
+# ---- ONNX export + quantization (scripts/export_onnx.py) ----
+onnx==1.17.0
+onnxsim==0.4.36
+# onnxruntime-gpu's default PyPI wheel (>=1.19) targets CUDA 12.x + cuDNN 9.x,
+# matching this project's CUDA 12.1 torch build. UNLIKE torch, onnxruntime-gpu
+# does NOT bundle its own CUDA/cuDNN -- it dynamically loads them from a
+# system-wide install. If `onnxruntime.get_available_providers()` doesn't list
+# CUDAExecutionProvider, install the CUDA 12 Toolkit + cuDNN 9 from NVIDIA and
+# ensure their `bin/` dirs are on PATH. CPU-only fallback works with no setup
+# and is what export_onnx.py uses for correctness checks (it mirrors the
+# on-device CPU target anyway).
+onnxruntime-gpu==1.19.2
+
+# ---- CLI / utils ----
+tqdm==4.66.5
+PyYAML==6.0.2
