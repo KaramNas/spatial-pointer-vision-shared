@@ -151,6 +151,11 @@ python scripts/export_onnx.py --checkpoint training/checkpoints/dev-run --output
 See the TODOs inside `scripts/export_onnx.py` for what's still needed to get
 an exported model actually running on Quest 3's Snapdragon XR2 Gen 2 chip.
 
+Disk space note: exporting the 2B model to ONNX (fp32, before quantization)
+needs roughly 9GB of scratch space, and the quantization step needs a
+similar amount again temporarily. Make sure you have 15-20GB free before
+running this.
+
 ### 6. Quest app
 
 Requires Unity 2022 LTS + the Meta XR SDK, neither of which is installed in
@@ -158,21 +163,34 @@ this environment. See [quest-app/README.md](quest-app/README.md).
 
 ## Project status
 
-**Working end-to-end today (on this machine, without any hardware):**
-- Python env installs cleanly and `torch.cuda.is_available()` is `True`
-- `training/finetune.py` runs a real QLoRA training loop against the dummy
-  JSONL dataset and writes a LoRA checkpoint to `training/checkpoints/`
-- `dataset/extract_frames.py` and `dataset/prepare_dataset.py` run against
-  local files
-- `server/main.py` loads a real (or dummy-trained) checkpoint and serves
-  real Qwen2-VL inference over `/ws/identify`
-- `docker-compose.yml` builds and runs the server container
+**Verified working end-to-end on this machine (RTX 4070, 12GB VRAM), not just reviewed:**
+- Full training + server environment installed; `torch.cuda.is_available()`
+  returns `True` (`2.4.1+cu121`, `NVIDIA GeForce RTX 4070`)
+- `training/finetune.py` ran a real QLoRA training loop against the dummy
+  dataset (Qwen2-VL-2B-Instruct in 4-bit, LoRA adapter, 5 optimizer steps,
+  loss dropping from 4.42 -> 2.33) and saved a real checkpoint to
+  `training/checkpoints/dev-run/`
+- `server/model_service.py` loaded that checkpoint (base model in 4-bit +
+  unmerged LoRA adapter) and ran real inference through `/ws/identify`'s
+  code path, returning a real `{"label": ..., "confidence": ...}` response
+- `scripts/export_onnx.py` merged the LoRA adapter and exported a real,
+  `onnx.checker`-validated ONNX graph from that checkpoint
+- `dataset/prepare_dataset.py` ran end-to-end against synthetic COCO
+  annotations, correctly cropping and re-basing bounding boxes
+- Found and fixed 3 real bugs this way: a path-handling crash in
+  `prepare_dataset.py`, an `onnx.checker` call that failed on the >2GB
+  protobuf a 2B-param fp32 export produces, and a spurious pydantic warning
+  in `server/config.py`
+- `docker-compose.yml` config validated; not build-tested here (no time left
+  in this session for another multi-GB CUDA base image pull)
 - CI lint workflow runs on every push/PR
 
-**Scaffolded, needs manual setup before it can be tested:**
-- `scripts/export_onnx.py` -- ONNX export + int8 quantization logic is real,
-  but running it on-device requires the Unity/Android/XR2 toolchain (see
-  TODOs in the file)
+**Not fully verified / needs more disk space or hardware:**
+- `scripts/export_onnx.py`'s int8 quantization step (`quantize_dynamic`) was
+  **not** verified end-to-end -- it needs roughly 2x the fp32 export's disk
+  footprint again temporarily, and this machine ran out of space
+  mid-quantization during testing (see the disk space note in Setup step 5).
+  The export + `onnx.checker` validation steps before it did pass for real.
 - `quest-app/` -- all five C# scripts have real method signatures, XML doc
   comments, and a working `InferenceClient.cs` WebSocket client, but
   everything touching the Meta XR SDK (hand tracking, depth mesh, passthrough
@@ -180,5 +198,10 @@ this environment. See [quest-app/README.md](quest-app/README.md).
   it can't be compiled or tested without Unity + the SDK installed
 - Real dataset: you need actual Quest 3 recordings run through Label Studio
   before `prepare_dataset.py` has real input to convert
+
+**Machine note (unrelated to this project's code):** this machine's C: drive
+was found to be nearly full (13GB free out of 931GB) during testing. Worth
+clearing up before running a real training job or the ONNX export pipeline,
+both of which need multi-GB scratch space.
 
 See each subfolder's README/docstrings for details.
