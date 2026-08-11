@@ -8,7 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # protected_namespaces=() disables pydantic's default "model_" field-name
+    # warning -- model_checkpoint_path is our own field, not a pydantic
+    # internal, but it happens to share that prefix.
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", protected_namespaces=())
 
     # Base model to load. Must match what training/finetune.py was run with
     # if MODEL_CHECKPOINT_PATH is set (a LoRA adapter only applies cleanly to

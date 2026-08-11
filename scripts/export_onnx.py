@@ -149,8 +149,12 @@ def export_to_onnx(model, trace_inputs, output_path: Path, opset: int) -> None:
     )
 
     print("[export_onnx] Validating exported graph with onnx.checker...")
-    onnx_model = onnx.load(str(output_path))
-    onnx.checker.check_model(onnx_model)
+    # A 2B+ param model's ONNX graph exceeds protobuf's 2GB in-memory message
+    # limit, so onnx.checker.check_model() must be given the file PATH (which
+    # it streams / handles via external-data-aware checking) rather than a
+    # loaded ModelProto object -- passing the loaded model directly raises
+    # "This protobuf of onnx model is too large (>2GB)" for anything this size.
+    onnx.checker.check_model(str(output_path))
     print("[export_onnx] Graph is structurally valid.")
 
 

@@ -132,6 +132,19 @@ def load_label_studio(annotations_path: Path) -> list[RawAnnotation]:
     return results
 
 
+def _to_jsonl_path(crop_path: Path) -> str:
+    """Renders a cropped-image path for the JSONL record: relative to the
+    repo root when possible (portable, matches the paths used throughout
+    this repo's docs/examples), falling back to an absolute path if
+    --output_dir was pointed somewhere outside the repo.
+    """
+    resolved = crop_path.resolve()
+    try:
+        return str(resolved.relative_to(REPO_ROOT)).replace("\\", "/")
+    except ValueError:
+        return str(resolved).replace("\\", "/")
+
+
 def _find_source_image(images_dir: Path, file_name: str) -> Path | None:
     direct = images_dir / file_name
     if direct.exists():
@@ -240,7 +253,7 @@ def main() -> None:
 
         records.append(
             {
-                "image_path": str(crop_path.resolve().relative_to(REPO_ROOT)).replace("\\", "/"),
+                "image_path": _to_jsonl_path(crop_path),
                 "object_label": raw.label,
                 "bounding_box": list(clamped_bbox),
             }
