@@ -1,0 +1,17 @@
+# Motion-prediction sub-project: pose extraction + trajectory forecasting.
+# Separate from training/requirements.txt and server/requirements.txt --
+# this is a different ML problem (time-series forecasting on pose
+# keypoints, not vision-language image classification) and intentionally
+# does not touch the object-identification pipeline.
+#
+# torch/numpy/opencv-python are already installed in the repo's shared
+# .venv (see training/requirements.txt) -- only mediapipe is new here.
+# Install with:
+#   pip install -r motion-prediction/requirements.txt
+
+mediapipe==0.10.14
+opencv-python==4.10.0.84
+numpy==1.26.4
+torch==2.4.1+cu121
+tqdm==4.66.5
+matplotlib==3.9.2

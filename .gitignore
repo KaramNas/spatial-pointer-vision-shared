@@ -34,6 +34,18 @@ dataset/annotations/*
 *.mp4
 *.mov
 
+# --- Motion prediction sub-project (large / private video, keep structure + dummy example) ---
+motion-prediction/data/raw_videos/*
+!motion-prediction/data/raw_videos/.gitkeep
+motion-prediction/data/poses/*
+!motion-prediction/data/poses/.gitkeep
+!motion-prediction/data/poses/dummy_jab_*.npy
+!motion-prediction/data/poses/dummy_jab_*.json
+motion-prediction/data/dataset/*
+!motion-prediction/data/dataset/.gitkeep
+motion-prediction/checkpoints/*
+!motion-prediction/checkpoints/.gitkeep
+
 # --- ONNX export output ---
 scripts/exported/*
 !scripts/exported/.gitkeep

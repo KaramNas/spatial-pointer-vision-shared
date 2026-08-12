@@ -1,0 +1,16 @@
+{
+  "clip_name": "dummy_jab_007",
+  "fps": 30,
+  "num_frames": 90,
+  "landmark_names": [
+    "left_shoulder",
+    "right_shoulder",
+    "left_elbow",
+    "right_elbow",
+    "left_wrist",
+    "right_wrist",
+    "left_hip",
+    "right_hip"
+  ],
+  "source": "synthetic (make_dummy_pose_data.py)"
+}
