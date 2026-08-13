@@ -7,10 +7,20 @@ install and wire up before that's true.
 ## Why this is scaffold-only
 
 Building and testing this piece requires:
-- Unity Hub + Unity **2022 LTS**
-- The **Meta XR SDK** (Package Manager: Core, Interaction SDK)
+- Unity Hub + **Unity 6** (not 2022 LTS -- see version note below)
+- The **Meta XR SDK** (Package Manager: Core, Interaction SDK) via the
+  **Unity OpenXR Plugin**
 - A **Meta Quest 3** to actually test hand tracking / passthrough / depth on
   (the Editor can simulate some of this but not reliably enough to trust)
+
+**Version note (checked against Meta's docs, not guessed):** this project
+was originally scoped against Unity 2022 LTS + the older Oculus XR Plugin,
+which is now deprecated. Meta's current recommended path is the **Unity
+OpenXR Plugin**, which requires **Unity 6+** and **Meta XR SDK v74+** --
+and critically, **the Depth API that `DepthRaycaster.cs` depends on is not
+supported at all on Unity versions before 6**. So Unity 6 isn't just
+"newer and fine," it's required for this specific project's room-depth
+raycasting to work.
 
 None of that exists in this repo's dev environment, so these scripts were
 written as realistic, XML-documented method signatures with the actual logic
@@ -50,40 +60,54 @@ hierarchy.
 
 ## Setup
 
-1. Install **Unity Hub**, then Unity **2022 LTS** through it (Android Build
-   Support module included).
-2. Create a new 3D (URP recommended) project, or open one if you've already
-   started this part.
-3. **Window > Package Manager > Add package from git URL**:
+1. Install **Unity Hub**, then **Unity 6** through it (Android Build
+   Support module included). If a Unity 6.x Editor with Android + Windows
+   support is already installed on your machine, you likely don't need to
+   install anything here -- just confirm the Android module is present
+   (Unity Hub > Installs > your version > gear icon > Add Modules).
+2. Create a new 3D (URP recommended) project using that Unity 6 install, or
+   open one if you've already started this part.
+3. **Window > Package Manager > Unity Registry**, install **OpenXR Plugin**
+   (this is what replaces the old Oculus XR Plugin path).
+4. **Window > Package Manager > Add package from git URL**:
    - `https://github.com/endel/NativeWebSocket.git#upm` (required by
      `InferenceClient.cs` -- see the comment at the top of that file for why
      this was chosen over `System.Net.WebSockets`)
-4. Install the **Meta XR SDK** via the Unity Asset Store or Package Manager
-   (search "Meta XR"): at minimum the **Meta XR Core SDK** (hand tracking,
-   `OVRCameraRig`, Scene API) and **Meta XR Interaction SDK**. Follow Meta's
-   own project setup tool (Meta > Tools > Project Setup Tool in the Unity
-   menu once installed) -- it auto-configures most of the Android/XR
-   player settings this needs.
-5. **Window > TextMeshPro > Import TMP Essential Resources** (needed by
+5. Install the **Meta XR SDK v74+** via the Unity Asset Store or Package
+   Manager (search "Meta XR"): at minimum the **Meta XR Core SDK** (hand
+   tracking, `OVRCameraRig`, Scene/Depth API) and **Meta XR Interaction
+   SDK**. Follow Meta's own project setup tool (Meta > Tools > Project
+   Setup Tool in the Unity menu once installed) -- it auto-configures most
+   of the Android/XR player settings this needs, and will guide you through
+   enabling OpenXR + the Meta Quest feature group under **Project Settings
+   > XR Plug-in Management**.
+6. **Window > TextMeshPro > Import TMP Essential Resources** (needed by
    `ResultOverlay.cs`).
-6. Copy/import this repo's `quest-app/Assets/Scripts/` into your project's
+7. Copy/import this repo's `quest-app/Assets/Scripts/` into your project's
    `Assets/Scripts/` if you started the Unity project outside this repo, or
    point Unity at this repo directly if you created the project here (in
    which case they're already in the right place).
-7. Enable required permissions/capabilities in **Meta > Tools > Project
+8. Enable required permissions/capabilities in **Meta > Tools > Project
    Setup Tool** and the Android manifest: hand tracking, passthrough, scene
    (room mesh), and camera access. Exact toggle names vary by SDK version --
    the Project Setup Tool flags anything missing.
-8. Build an `OVRCameraRig` in your scene (Meta's prefab), add
+9. Build an `OVRCameraRig` in your scene (Meta's prefab), add
    `PointingRayController` + `DepthRaycaster` + `ObjectCropper` to it (or a
    child object), wire `PointingRayController.hand` to the rig's right-hand
    `OVRHand`, and set up the Scene API (`OVRSceneManager`) so room-mesh
    anchors get colliders for `DepthRaycaster` to hit.
-9. Add `InferenceClient` and `ResultOverlay` anywhere in the scene; set
-   `InferenceClient.serverHost` to your PC's LAN IP (shown when you run
-   `python server/main.py` -- see the root README).
-10. Build for Android (File > Build Settings > Android > Switch Platform),
+10. Add `InferenceClient` and `ResultOverlay` anywhere in the scene; set
+    `InferenceClient.serverHost` to your PC's LAN IP (shown when you run
+    `python server/main.py` -- see the root README).
+11. Build for Android (File > Build Settings > Android > Switch Platform),
     deploy to a Quest 3 over USB (Developer Mode enabled on the headset).
+
+**Suggestion for a tight disk budget:** if C: is low on space, point Unity
+Hub's install location and your new project's location at another drive
+with room (Unity Hub > Preferences > lets you change the default Editor/
+project install location) -- Unity projects with Android build support can
+easily use 10-20GB between the Editor, Android SDK/NDK components, and
+Library/ build cache.
 
 ## Two things to get right before trusting results
 

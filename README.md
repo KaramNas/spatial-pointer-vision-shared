@@ -62,7 +62,7 @@ spatial-pointer-vision-shared/
 │   └── Dockerfile
 ├── scripts/                Python: export pipeline
 │   └── export_onnx.py      merge LoRA -> ONNX -> int8 quantize
-├── quest-app/               C#: Unity 2022 LTS Quest 3 client (scaffold)
+├── quest-app/               C#: Unity 6 Quest 3 client (scaffold)
 │   ├── Assets/Scripts/
 │   │   ├── PointingRayController.cs
 │   │   ├── DepthRaycaster.cs
@@ -158,8 +158,8 @@ running this.
 
 ### 6. Quest app
 
-Requires Unity 2022 LTS + the Meta XR SDK, neither of which is installed in
-this environment. See [quest-app/README.md](quest-app/README.md).
+Requires Unity 6 (not 2022 LTS -- Meta's Depth API needs Unity 6+, see
+[quest-app/README.md](quest-app/README.md) for why) + the Meta XR SDK.
 
 ## Project status
 
